@@ -32,7 +32,9 @@ export default async function MovieIdPage({
   params: { movieId: string }
 }) {
   await new Promise(resolve => setTimeout(resolve, 2000))
-  const res = await fetch(`${process.env.NEXT_PUBLIC_CLIENT_URL}/${movieId}`)
+  const res = await fetch(
+    `${process.env.NEXT_PUBLIC_CLIENT_URL}/api/movies/${movieId}`
+  )
   const movie = await res.json()
   return (
     <>

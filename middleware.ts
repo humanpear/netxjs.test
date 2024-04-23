@@ -1,10 +1,26 @@
 import { NextResponse } from 'next/server'
 import type { NextRequest } from 'next/server'
+import { match } from 'path-to-regexp'
+import { auth } from '@/auth'
+
+const matchersForAuth = [
+  '/dashboard/:path*',
+  '/myaccount/:path*',
+  '/settings/:path*',
+  '...'
+]
 
 export async function middleware(request: NextRequest) {
-  console.log('Middleware!', request.nextUrl.pathname)
-  // if (request.nextUrl.pathname === '/signin') {
-  //   return NextResponse.redirect(new URL('/', request.url))
-  // }
+  if (isMatch(request.nextUrl.pathname, matchersForAuth)) {
+    return (await auth()) // 세션 정보 확인
+      ? NextResponse.next()
+      : NextResponse.redirect(
+          new URL(`/signin?callbackUrl=${request.url}`, request.url)
+        )
+  }
   return NextResponse.next()
+}
+
+function isMatch(pathname: string, urls: string[]) {
+  return urls.some(url => !!match(url)(pathname))
 }
